@@ -212,15 +212,20 @@ td { vertical-align: top; }
    ========================================================================== */
 
 
-#container{
+html.touch #container{
     position:relative;
     overflow: hidden;
 }
 
-#page-container {
+html.touch #page-container {
     position:absolute;
 	left:0px;
 }
+
+html.touch button.next, html.touch button.prev {
+    display: none;
+}
+
 #page1 {
     background: #ff69b4;
 }
@@ -237,7 +242,7 @@ td { vertical-align: top; }
     background: #faebd7;
 }
 
-.page {
+html.touch .page {
     padding:0;
 	margin:0;
 	float:left;

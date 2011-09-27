@@ -20,7 +20,9 @@ function resizePages() {
         $this.css('width',width);
         pageContainerWidth += width;
     });
-    $('#page-container').css('width',pageContainerWidth).css('height',height);
+    if($("html").hasClass("touch")) {
+        $('#page-container').css('width',pageContainerWidth).css('height',height);
+    }
 }
 
 function pageTurn(direction) {
@@ -30,22 +32,28 @@ function pageTurn(direction) {
 	if (newPage) {
 		$('.page').removeClass('selected');
 		newPage.addClass('selected');
+        if($("html").hasClass("touch")) {
+            var pageNumber = newPage.attr("id").replace(/[^0-9]/gi, '');
+            var width = newPage.css('width').replace(/[^0-9]/gi, '');
+            var left = (pageNumber-1) * width;
 
-        var pageNumber = newPage.attr("id").replace(/[^0-9]/gi, '');
-        var width = newPage.css('width').replace(/[^0-9]/gi, '');
-        var left = (pageNumber-1) * width;
-
-        newPage.parent().animate({'left': "-"+left+"px"}, 1200, "easeOutBack");
+            newPage.parent().animate({'left': "-"+left+"px"}, 1200, "easeOutBack");
+        } else {
+            jQuery.scrollTo.window().queue([]).stop();
+            $(window).scrollTo(newPage,1200,{easing:'easeOutBack'});
+        }
 	}
 }
 
 $(document).ready(function() {
 
-    $("#container").swipe( {threshold:100, swipeLeft: function(event) {
-        pageTurn("next");
-    }, swipeRight: function(event) {
-        pageTurn("prev");
-    }} );
+    if($("html").hasClass("touch")) {
+        $("#container").swipe( {threshold:100, swipeLeft: function(event) {
+            pageTurn("next");
+        }, swipeRight: function(event) {
+            pageTurn("prev");
+        }} );
+    }
 
     $('.page .next').click(function(e) {
 		pageTurn('next');
