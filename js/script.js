@@ -37,29 +37,37 @@ function pageTurn(direction) {
             var width = newPage.css('width').replace(/[^0-9]/gi, '');
             var left = (pageNumber-1) * width;
 
-            newPage.parent().animate({'left': "-"+left+"px"}, 1200, "easeOutBack");
+            newPage.parent().animate({'left': "-"+left+"px"}, 1200, "easeOutBack", function(){
+                turning = false;
+            });
         } else {
             jQuery.scrollTo.window().queue([]).stop();
-            $(window).scrollTo(newPage,1200,{easing:'easeOutBack'});
+            $(window).scrollTo(newPage,1200,{easing:'easeOutBack', onAfter:function(){
+                turning = false;
+            }});
         }
 	}
 }
-
+var turning = false;
 $(document).ready(function() {
 
     if($("html").hasClass("touch")) {
         $("#container").swipe( {threshold:100, swipeLeft: function(event) {
+            turning = true;
             pageTurn("next");
         }, swipeRight: function(event) {
+            turning = true;
             pageTurn("prev");
         }} );
     }
 
     $('.page .next').click(function(e) {
+        turning = true;
 		pageTurn('next');
 	});
 
     $('.page .prev').click(function(e) {
+        turning = true;
 		pageTurn('prev');
 	});
 
@@ -71,16 +79,33 @@ $(document).ready(function() {
 
     $(window).scroll(function(e) {
 		var top = $(document).scrollTop();
-		var wHeight = Math.max(640,$(window).height());
+		var wHeight = 200;
+        
+		if (turning === false && top < $('.page.selected').offset().top-wHeight/2) {
+			var index = $('.page.selected').index();
 
-		if (top < $('.page.selected').offset().top-wHeight/2) {
-			var index = $('.page.selected').index();
 			$('.page').removeClass('selected');
-			$('.page').eq(Math.max(0,index-1)).addClass('selected');
-		} else if (top > $('.page.selected').offset().top + wHeight/2) {
+
+            var newPage = $('.page').eq(Math.max(0,index-1));
+			newPage.addClass('selected');
+
+            turning = true;
+            $(window).scrollTo(newPage,1200,{easing:'easeOutBack', onAfter:function(){
+                turning = false;
+            }});
+
+		} else if (turning === false && top > $('.page.selected').offset().top + wHeight/2) {
 			var index = $('.page.selected').index();
-			$('.page').removeClass('selected');
-			$('.page').eq(Math.min($('.page').length-1,index+1)).addClass('selected');
+
+            $('.page').removeClass('selected');
+
+            var newPage = $('.page').eq(Math.min($('.page').length-1,index+1));
+			newPage.addClass('selected');
+
+            turning = true;
+            $(window).scrollTo(newPage,1200,{easing:'easeOutBack', onAfter:function(){
+                turning = false;
+            }});
 		}
 	});
 });
