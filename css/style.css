@@ -212,24 +212,36 @@ td { vertical-align: top; }
    ========================================================================== */
 
 
+#container{
+    position:relative;
+    overflow: hidden;
+}
 
-.page1 {
+#page-container {
+    position:absolute;
+	left:0px;
+}
+#page1 {
     background: #ff69b4;
 }
 
-.page2 {
+#page2 {
     background: #b22222;
 }
 
-.page3 {
+#page3 {
     background: #bc8f8f;
 }
 
-.page4 {
+#page4 {
     background: #faebd7;
 }
 
-
+.page {
+    padding:0;
+	margin:0;
+	float:left;
+}
 
 
 
