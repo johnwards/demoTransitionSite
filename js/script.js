@@ -40,11 +40,11 @@ function pageTurn(direction) {
 		$('.page').removeClass('selected');
 		newPage.addClass('selected');
         if($("html").hasClass("touch")) {
-            var pageNumber = newPage.attr("id").replace(/[^0-9]/gi, '');
+            var pageNumber = newPage.index();
             var width = newPage.width();
-            var left = (pageNumber-1) * width;
+            var left = pageNumber * width * -1;
 
-            newPage.parent().animate({'left': "-"+left+"px"}, 1200, "easeOutBack");
+            newPage.parent().animate({left: left}, 1200, 'easeOutBack');
         } else {
             jQuery.scrollTo.window().queue([]).stop();
             $(window).scrollTo(newPage,1200,{easing:'easeOutBack'});
