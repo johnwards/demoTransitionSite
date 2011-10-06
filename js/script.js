@@ -32,44 +32,39 @@ function resizePages() {
 	});
 }
 
+//returns a function that will turn the page in a given direction
 function pageTurn(direction) {
-	
-	var newPage = $.proxy($.fn[direction], $('.page.selected'))();
-	
-	if (newPage.size()) {
-		$('.page').removeClass('selected');
-		newPage.addClass('selected');
-        if($("html").hasClass("touch")) {
-            var pageNumber = newPage.index();
-            var width = newPage.width();
-            var left = pageNumber * width * -1;
+	return function(){
+		var newPage = $.proxy($.fn[direction], $('.page.selected'))();
 
-            newPage.parent().animate({left: left}, 1200, 'easeOutBack');
-        } else {
-            jQuery.scrollTo.window().queue([]).stop();
-            $(window).scrollTo(newPage,1200,{easing:'easeOutBack'});
-        }
-	}
+		if (newPage.size()) {
+			$('.page').removeClass('selected');
+			newPage.addClass('selected');
+	        if($("html").hasClass("touch")) {
+	            var pageNumber = newPage.index();
+	            var width = newPage.width();
+	            var left = pageNumber * width * -1;
+
+	            newPage.parent().animate({left: left}, 1200, 'easeOutBack');
+	        } else {
+	            jQuery.scrollTo.window().queue([]).stop();
+	            $(window).scrollTo(newPage,1200,{easing:'easeOutBack'});
+	        }
+		}
+	};
 }
 
 $(document).ready(function() {
 
 	$('html.touch #container').swipe({
 		threshold:100, 
-		swipeLeft: function(event) {
-			pageTurn("next");
-		}, swipeRight: function(event) {
-			pageTurn("prev");
-		}
+		swipeLeft: pageTurn('next'), 
+		swipeRight: pageTurn('prev')
 	});
 
-    $('.page .next').click(function(e) {
-		pageTurn('next');
-	});
+    $('.page .next').click(pageTurn('next'));
 
-    $('.page .prev').click(function(e) {
-		pageTurn('prev');
-	});
+    $('.page .prev').click(pageTurn('prev'));
 
     //resize
 	$(window).resize(resizePages).resize();
