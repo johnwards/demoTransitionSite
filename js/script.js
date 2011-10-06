@@ -14,20 +14,17 @@ function resizePages() {
 		height:height
 	});
 	
-	$('.page').each(function(){
-        var $this = $(this);
-        var currentHeight = $this.height();
-        if(currentHeight < height) {
-            $this.css('height',height);
-        }
-
-        $this.css('width',width);
-    });
-
-	var pageContainerWidth = width * $('.page').size();
+	// set the widths to the container
+	$('.page').width(width)
+	
+	// and any pages shorter than the height, to the height
+		.filter(function(){
+			return $(this).height() < height;
+		}).height(height);
+	
 	
 	$('html.touch #page-container').css({
-		width:pageContainerWidth,
+		width:width * $('.page').size(),
 		height:height
 	});
 }
