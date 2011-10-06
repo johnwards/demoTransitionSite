@@ -8,11 +8,16 @@ function resizePages() {
     var w = $(window).width();
 	var height  =  h < 480 ? 480 : h;
     var width  =  w;
-    $('#container').css('width',width).css('height',height);
+
+    $('#container').css({
+		width:width,
+		height:height
+	});
+	
     var pageContainerWidth = 0;
 	$('.page').each(function(){
         var $this = $(this);
-        var currentHeight = $this.css('height').replace(/[^0-9]/gi, '');
+        var currentHeight = $this.height();
         if(currentHeight < height) {
             $this.css('height',height);
         }
@@ -20,9 +25,11 @@ function resizePages() {
         $this.css('width',width);
         pageContainerWidth += width;
     });
-    if($("html").hasClass("touch")) {
-        $('#page-container').css('width',pageContainerWidth).css('height',height);
-    }
+	
+	$('html.touch #page-container').css({
+		width:pageContainerWidth,
+		height:height
+	});
 }
 
 function pageTurn(direction) {
@@ -34,7 +41,7 @@ function pageTurn(direction) {
 		newPage.addClass('selected');
         if($("html").hasClass("touch")) {
             var pageNumber = newPage.attr("id").replace(/[^0-9]/gi, '');
-            var width = newPage.css('width').replace(/[^0-9]/gi, '');
+            var width = newPage.width();
             var left = (pageNumber-1) * width;
 
             newPage.parent().animate({'left': "-"+left+"px"}, 1200, "easeOutBack");
@@ -47,13 +54,14 @@ function pageTurn(direction) {
 
 $(document).ready(function() {
 
-    if($("html").hasClass("touch")) {
-        $("#container").swipe( {threshold:100, swipeLeft: function(event) {
-            pageTurn("next");
-        }, swipeRight: function(event) {
-            pageTurn("prev");
-        }} );
-    }
+	$('html.touch #container').swipe({
+		threshold:100, 
+		swipeLeft: function(event) {
+			pageTurn("next");
+		}, swipeRight: function(event) {
+			pageTurn("prev");
+		}
+	});
 
     $('.page .next').click(function(e) {
 		pageTurn('next');
@@ -64,10 +72,7 @@ $(document).ready(function() {
 	});
 
     //resize
-	$(window).resize(function(e) {
-		resizePages();
-	});
-	resizePages();
+	$(window).resize(resizePages).resize();
 
     $(window).scroll(function(e) {
 		var top = $(document).scrollTop();
