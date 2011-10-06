@@ -33,10 +33,10 @@ function resizePages() {
 }
 
 function pageTurn(direction) {
-	var newPage;
-	if (direction == 'next' && $('.page.selected').index() < $('.page').length-1)  newPage = $('.page.selected').next();
-	else if (direction == 'prev' && $('.page.selected').index() > 0) newPage = $('.page.selected').prev();
-	if (newPage) {
+	
+	var newPage = $.proxy($.fn[direction], $('.page.selected'))();
+	
+	if (newPage.size()) {
 		$('.page').removeClass('selected');
 		newPage.addClass('selected');
         if($("html").hasClass("touch")) {
