@@ -14,7 +14,6 @@ function resizePages() {
 		height:height
 	});
 	
-    var pageContainerWidth = 0;
 	$('.page').each(function(){
         var $this = $(this);
         var currentHeight = $this.height();
@@ -23,8 +22,9 @@ function resizePages() {
         }
 
         $this.css('width',width);
-        pageContainerWidth += width;
     });
+
+	var pageContainerWidth = width * $('.page').size();
 	
 	$('html.touch #page-container').css({
 		width:pageContainerWidth,
