@@ -8,66 +8,63 @@ function resizePages() {
     var w = $(window).width();
 	var height  =  h < 480 ? 480 : h;
     var width  =  w;
-    $('#container').css('width',width).css('height',height);
-    var pageContainerWidth = 0;
-	$('.page').each(function(){
-        var $this = $(this);
-        var currentHeight = $this.css('height').replace(/[^0-9]/gi, '');
-        if(currentHeight < height) {
-            $this.css('height',height);
-        }
 
-        $this.css('width',width);
-        pageContainerWidth += width;
-    });
-    if($("html").hasClass("touch")) {
-        $('#page-container').css('width',pageContainerWidth).css('height',height);
-    }
+    $('#container').css({
+		width:width,
+		height:height
+	});
+	
+	// set the widths to the container
+	$('.page').width(width)
+	
+	// and any pages shorter than the height, to the height
+		.filter(function(){
+			return $(this).height() < height;
+		}).height(height);
+	
+	
+	$('html.touch #page-container').css({
+		width:width * $('.page').size(),
+		height:height
+	});
 }
 
+//returns a function that will turn the page in a given direction
 function pageTurn(direction) {
-	var newPage;
-	if (direction == 'next' && $('.page.selected').index() < $('.page').length-1)  newPage = $('.page.selected').next();
-	else if (direction == 'prev' && $('.page.selected').index() > 0) newPage = $('.page.selected').prev();
-	if (newPage) {
-		$('.page').removeClass('selected');
-		newPage.addClass('selected');
-        if($("html").hasClass("touch")) {
-            var pageNumber = newPage.attr("id").replace(/[^0-9]/gi, '');
-            var width = newPage.css('width').replace(/[^0-9]/gi, '');
-            var left = (pageNumber-1) * width;
+	return function(){
+		var newPage = $.proxy($.fn[direction], $('.page.selected'))();
 
-            newPage.parent().animate({'left': "-"+left+"px"}, 1200, "easeOutBack");
-        } else {
-            jQuery.scrollTo.window().queue([]).stop();
-            $(window).scrollTo(newPage,1200,{easing:'easeOutBack'});
-        }
-	}
+		if (newPage.size()) {
+			$('.page').removeClass('selected');
+			newPage.addClass('selected');
+	        if($("html").hasClass("touch")) {
+	            var pageNumber = newPage.index();
+	            var width = newPage.width();
+	            var left = pageNumber * width * -1;
+
+	            newPage.parent().animate({left: left}, 1200, 'easeOutBack');
+	        } else {
+	            jQuery.scrollTo.window().queue([]).stop();
+	            $(window).scrollTo(newPage,1200,{easing:'easeOutBack'});
+	        }
+		}
+	};
 }
 
 $(document).ready(function() {
 
-    if($("html").hasClass("touch")) {
-        $("#container").swipe( {threshold:100, swipeLeft: function(event) {
-            pageTurn("next");
-        }, swipeRight: function(event) {
-            pageTurn("prev");
-        }} );
-    }
-
-    $('.page .next').click(function(e) {
-		pageTurn('next');
+	$('html.touch #container').swipe({
+		threshold:100, 
+		swipeLeft: pageTurn('next'), 
+		swipeRight: pageTurn('prev')
 	});
 
-    $('.page .prev').click(function(e) {
-		pageTurn('prev');
-	});
+    $('.page .next').click(pageTurn('next'));
+
+    $('.page .prev').click(pageTurn('prev'));
 
     //resize
-	$(window).resize(function(e) {
-		resizePages();
-	});
-	resizePages();
+	$(window).resize(resizePages).resize();
 
     $(window).scroll(function(e) {
 		var top = $(document).scrollTop();
